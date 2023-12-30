@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>점수 변환</h2>
+
+<p>점수를 입력하고 변환 버튼을 누르세요:</p>
+
+<input type="text" id="myInput">
+<button onclick="lookupScore()">변환</button>
+
+<p id="result"></p>
+
+<script>
+async function lookupScore() {
+    var inputScore = document.getElementById("myInput").value;
+
+    // CSV 파일 가져오기
+    var response = await fetch('https://github.com/seanyjeong/maxilsan/blob/main/silgi.csv');
+    var data = await response.text();
+
+    // CSV 파일 파싱
+    var rows = data.split('\n');
+    var scores = rows[0].split(',');
+    var results = rows[1].split(',');
+
+    // 입력한 점수에 대한 결과 찾기
+    for (var i = 3; i < scores.length; i++) {
+        if (scores[i] == inputScore) {
+            document.getElementById("result").innerHTML = "결과: " + results[i];
+            return;
+        }
+    }
+
+    document.getElementById("result").innerHTML = "결과를 찾을 수 없습니다.";
+}
+</script>
+
+</body>
+</html>
