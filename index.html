@@ -6,46 +6,56 @@
 <body>
     <h1>University A Record Input</h1>
     <form id="recordForm">
-        <label for="event">Select Event:</label>
-        <select id="event" name="event" required>
-            <option value="100m">100m</option>
-            <option value="제멀">제멀</option>
+        <h2>100m</h2>
+        <label for="record100m">Enter 100m Record (seconds):</label>
+        <input type="number" id="record100m" name="record100m" step="0.01" required>
+        <br>
+        <label for="gender100m">Select Gender:</label>
+        <select id="gender100m" name="gender100m" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
         </select>
+        <h2>제멀</h2>
+        <label for="recordLongJump">Enter 제멀 Record (meters):</label>
+        <input type="number" id="recordLongJump" name="recordLongJump" step="0.01" required>
         <br>
-        <label for="record">Enter Record (seconds or meters):</label>
-        <input type="number" id="record" name="record" step="0.01" required>
-        <br>
-        <label for="gender">Select Gender:</label>
-        <select id="gender" name="gender" required>
+        <label for="genderLongJump">Select Gender:</label>
+        <select id="genderLongJump" name="genderLongJump" required>
             <option value="male">Male</option>
             <option value="female">Female</option>
         </select>
         <br>
         <button type="submit">Submit</button>
     </form>
-    <h2>Score: <span id="score"></span></h2>
+    <h2>Total Score: <span id="totalScore"></span></h2>
 
     <script>
         document.getElementById('recordForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
-            const eventName = document.getElementById('event').value;
-            const record = document.getElementById('record').value;
-            const gender = document.getElementById('gender').value;
+            const record100m = document.getElementById('record100m').value;
+            const gender100m = document.getElementById('gender100m').value;
+            const recordLongJump = document.getElementById('recordLongJump').value;
+            const genderLongJump = document.getElementById('genderLongJump').value;
 
-            fetch('https://supermax.kr:4000/get-score', {
+            fetch('https://supermax.kr:4000/get-total-score', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ event: eventName, record: record, gender: gender })
+                body: JSON.stringify({
+                    records: [
+                        { event: '100m', record: record100m, gender: gender100m },
+                        { event: '제멀', record: recordLongJump, gender: genderLongJump }
+                    ]
+                })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    document.getElementById('score').innerText = data.error;
+                    document.getElementById('totalScore').innerText = data.error;
                 } else {
-                    document.getElementById('score').innerText = data.score;
+                    document.getElementById('totalScore').innerText = data.totalScore;
                 }
             })
             .catch(error => {
