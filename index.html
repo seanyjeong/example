@@ -1,13 +1,18 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>University A 100m Record Input</title>
+    <title>University A Record Input</title>
 </head>
 <body>
-    <h1>University A 100m Record Input</h1>
+    <h1>University A Record Input</h1>
     <form id="recordForm">
-        <label for="record">Enter Record (seconds):</label>
+        <label for="event">Select Event:</label>
+        <select id="event" name="event" required>
+            <option value="100m">100m</option>
+            <option value="제멀">제멀</option>
+        </select>
+        <br>
+        <label for="record">Enter Record (seconds or meters):</label>
         <input type="number" id="record" name="record" step="0.01" required>
         <br>
         <label for="gender">Select Gender:</label>
@@ -24,6 +29,7 @@
         document.getElementById('recordForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
+            const eventName = document.getElementById('event').value;
             const record = document.getElementById('record').value;
             const gender = document.getElementById('gender').value;
 
@@ -32,7 +38,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ record: record, gender: gender })
+                body: JSON.stringify({ event: eventName, record: record, gender: gender })
             })
             .then(response => response.json())
             .then(data => {
