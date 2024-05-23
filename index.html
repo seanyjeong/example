@@ -233,4 +233,27 @@
                         });
                     });
 
-                    fetch('https://supermax.kr:4000/save
+                    fetch('https://supermax.kr:4000/save-scores', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ students: students })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(`에러: ${data.error}`);
+                        } else {
+                            alert('모든 기록이 성공적으로 저장되었습니다');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
