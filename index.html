@@ -1,103 +1,248 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>대학 기록 입력</title>
+    <title>기록 입력 페이지</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
-    <h1>대학 기록 입력</h1>
+    <h1>기록 입력 페이지</h1>
     <form id="recordForm">
-        <label for="university">대학교 선택:</label>
-        <select id="university" name="university" required>
-            <option value="가천체육">가천체육</option>
-            <!-- 추가할 대학들 -->
-        </select>
-        <h2>제멀</h2>
-        <label for="recordJemul">제멀 기록 입력 (cm):</label>
-        <input type="number" id="recordJemul" name="recordJemul" step="0.01" required>
-        <br>
-        <label for="genderJemul">성별 선택:</label>
-        <select id="genderJemul" name="genderJemul" required>
-            <option value="male">남자</option>
-            <option value="female">여자</option>
-        </select>
-        <h2>메던</h2>
-        <label for="recordMedun">메던 기록 입력 (m):</label>
-        <input type="number" id="recordMedun" name="recordMedun" step="0.01" required>
-        <br>
-        <label for="genderMedun">성별 선택:</label>
-        <select id="genderMedun" name="genderMedun" required>
-            <option value="male">남자</option>
-            <option value="female">여자</option>
-        </select>
-        <h2>10m</h2>
-        <label for="record10m">10m 기록 입력 (s):</label>
-        <input type="number" id="record10m" name="record10m" step="0.01" required>
-        <br>
-        <label for="gender10m">성별 선택:</label>
-        <select id="gender10m" name="gender10m" required>
-            <option value="male">남자</option>
-            <option value="female">여자</option>
-        </select>
-        <h2>배근력</h2>
-        <label for="recordBackStrength">배근력 기록 입력 (kg):</label>
-        <input type="number" id="recordBackStrength" name="recordBackStrength" step="0.01" required>
-        <br>
-        <label for="genderBackStrength">성별 선택:</label>
-        <select id="genderBackStrength" name="genderBackStrength" required>
-            <option value="male">남자</option>
-            <option value="female">여자</option>
-        </select>
-        <br>
-        <button type="submit">제출</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>이름</th>
+                    <th>성별</th>
+                    <th>대학</th>
+                    <th>제멀 (cm)</th>
+                    <th>제멀 점수</th>
+                    <th>메던 (m)</th>
+                    <th>메던 점수</th>
+                    <th>10m (초)</th>
+                    <th>10m 점수</th>
+                    <th>배근력 (kg)</th>
+                    <th>배근력 점수</th>
+                    <th>총점</th>
+                </tr>
+            </thead>
+            <tbody id="studentsContainer">
+                <tr class="student">
+                    <td>
+                        <input type="text" name="studentName" required>
+                        <button type="button" class="loadButton">불러오기</button>
+                    </td>
+                    <td>
+                        <select name="gender" required>
+                            <option value="male">남자</option>
+                            <option value="female">여자</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="university" required>
+                            <option value="가천체육">가천체육</option>
+                            <!-- 추가할 대학들 -->
+                        </select>
+                    </td>
+                    <td><input type="number" name="recordJemul" step="0.01" required></td>
+                    <td class="scoreJemul"></td>
+                    <td><input type="number" name="recordMedun" step="0.01" required></td>
+                    <td class="scoreMedun"></td>
+                    <td><input type="number" name="record10m" step="0.01" required></td>
+                    <td class="score10m"></td>
+                    <td><input type="number" name="recordBackStrength" step="0.01" required></td>
+                    <td class="scoreBackStrength"></td>
+                    <td class="totalScore"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" id="addStudentButton">학생 추가</button>
+        <button type="submit">총점 계산</button>
     </form>
-    <h2>총 점수: <span id="totalScore"></span></h2>
-
+    <button id="saveButton">모든 기록 저장</button>
     <script>
-        document.getElementById('recordForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const university = document.getElementById('university').value;
-            const recordJemul = document.getElementById('recordJemul').value;
-            const genderJemul = document.getElementById('genderJemul').value;
-            const recordMedun = document.getElementById('recordMedun').value;
-            const genderMedun = document.getElementById('genderMedun').value;
-            const record10m = document.getElementById('record10m').value;
-            const gender10m = document.getElementById('gender10m').value;
-            const recordBackStrength = document.getElementById('recordBackStrength').value;
-            const genderBackStrength = document.getElementById('genderBackStrength').value;
-
-            fetch('https://supermax.kr:4000/get-total-score', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    students: [
-                        {
-                            name: '학생',
+        document.addEventListener('DOMContentLoaded', function() {
+            const addStudentButton = document.getElementById('addStudentButton');
+            if (addStudentButton) {
+                addStudentButton.addEventListener('click', function() {
+                    const studentsContainer = document.getElementById('studentsContainer');
+                    const newRow = studentsContainer.rows[0].cloneNode(true);
+                    newRow.querySelectorAll('input').forEach(input => input.value = '');
+                    newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+                    newRow.querySelectorAll('td').forEach(td => {
+                        if (td.className !== 'totalScore') {
+                            td.innerText = '';
+                        }
+                    });
+                    const loadButton = newRow.querySelector('.loadButton');
+                    if (loadButton) {
+                        loadButton.addEventListener('click', loadStudent);
+                    }
+                    studentsContainer.appendChild(newRow);
+                });
+            }
+            const loadButtons = document.querySelectorAll('.loadButton');
+            loadButtons.forEach(button => {
+                button.addEventListener('click', loadStudent);
+            });
+            function loadStudent(event) {
+                const row = event.target.closest('.student');
+                const studentName = row.querySelector('input[name="studentName"]').value;
+                fetch(`https://supermax.kr:4000/get-student?name=${studentName}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(`에러: ${data.error}`);
+                    } else if (data.message) {
+                        alert(data.message);
+                    } else {
+                        const universitySelect = row.querySelector('select[name="university"]');
+                        const genderSelect = row.querySelector('select[name="gender"]');
+                        data.student.forEach(record => {
+                            universitySelect.value = record.university_name;
+                            genderSelect.value = record.gender;
+                            if (record.event_name === '제멀') {
+                                row.querySelector('input[name="recordJemul"]').value = record.record;
+                                row.querySelector('.scoreJemul').innerText = record.score;
+                            } else if (record.event_name === '메던') {
+                                row.querySelector('input[name="recordMedun"]').value = record.record;
+                                row.querySelector('.scoreMedun').innerText = record.score;
+                            } else if (record.event_name === '10m') {
+                                row.querySelector('input[name="record10m"]').value = record.record;
+                                row.querySelector('.score10m').innerText = record.score;
+                            } else if (record.event_name === '배근력') {
+                                row.querySelector('input[name="recordBackStrength"]').value = record.record;
+                                row.querySelector('.scoreBackStrength').innerText = record.score;
+                            }
+                            row.querySelector('.totalScore').innerText = record.total_score;
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+            document.getElementById('recordForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const students = [];
+                const rows = document.querySelectorAll('.student');
+                rows.forEach(row => {
+                    const studentName = row.querySelector('input[name="studentName"]').value;
+                    const university = row.querySelector('select[name="university"]').value;
+                    const gender = row.querySelector('select[name="gender"]').value;
+                    const recordJemul = row.querySelector('input[name="recordJemul"]').value;
+                    const recordMedun = row.querySelector('input[name="recordMedun"]').value;
+                    const record10m = row.querySelector('input[name="record10m"]').value;
+                    const recordBackStrength = row.querySelector('input[name="recordBackStrength"]').value;
+                    students.push({
+                        name: studentName,
+                        university: university,
+                        gender: gender,
+                        record: {
+                            '제멀': recordJemul,
+                            '메던': recordMedun,
+                            '10m': record10m,
+                            '배근력': recordBackStrength
+                        }
+                    });
+                });
+                fetch('https://supermax.kr:4000/get-total-score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ students: students })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.querySelectorAll('.totalScore').forEach(td => {
+                            td.innerText = '에러';
+                        });
+                    } else {
+                        document.querySelectorAll('.student').forEach(row => {
+                            const studentName = row.querySelector('input[name="studentName"]').value;
+                            const studentResult = data.find(item => item.name === studentName);
+                            if (studentResult) {
+                                row.querySelector('.scoreJemul').innerText = studentResult.scores['제멀'];
+                                row.querySelector('.scoreMedun').innerText = studentResult.scores['메던'];
+                                row.querySelector('.score10m').innerText = studentResult.scores['10m'];
+                                row.querySelector('.scoreBackStrength').innerText = studentResult.scores['배근력'];
+                                row.querySelector('.totalScore').innerText = studentResult.totalScore;
+                            } else {
+                                row.querySelectorAll('td').forEach(td => {
+                                    if (td.className !== 'totalScore') {
+                                        td.innerText = '점수 없음';
+                                    }
+                                });
+                                row.querySelector('.totalScore').innerText = '총점 없음';
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+            const saveButton = document.getElementById('saveButton');
+            if (saveButton) {
+                saveButton.addEventListener('click', function() {
+                    const students = [];
+                    const rows = document.querySelectorAll('.student');
+                    rows.forEach(row => {
+                        const studentName = row.querySelector('input[name="studentName"]').value;
+                        const university = row.querySelector('select[name="university"]').value;
+                        const gender = row.querySelector('select[name="gender"]').value;
+                        const recordJemul = row.querySelector('input[name="recordJemul"]').value;
+                        const recordMedun = row.querySelector('input[name="recordMedun"]').value;
+                        const record10m = row.querySelector('input[name="record10m"]').value;
+                        const recordBackStrength = row.querySelector('input[name="recordBackStrength"]').value;
+                        students.push({
+                            name: studentName,
                             university: university,
-                            gender: genderJemul, // assuming gender is the same for all events
+                            gender: gender,
                             record: {
                                 '제멀': recordJemul,
                                 '메던': recordMedun,
                                 '10m': record10m,
                                 '배근력': recordBackStrength
                             }
+                        });
+                    });
+
+                    fetch('https://supermax.kr:4000/save-scores', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ students: students })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(`에러: ${data.error}`);
+                        } else {
+                            alert('모든 기록이 성공적으로 저장되었습니다');
                         }
-                    ]
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    document.getElementById('totalScore').innerText = data.error;
-                } else {
-                    document.getElementById('totalScore').innerText = data[0].totalScore;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            }
         });
     </script>
 </body>
