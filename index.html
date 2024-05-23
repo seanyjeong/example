@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>University Record Input</title>
+    <title>기록 입력 페이지</title>
     <style>
         table {
             width: 100%;
@@ -20,29 +20,32 @@
     </style>
 </head>
 <body>
-    <h1>University Record Input</h1>
+    <h1>기록 입력 페이지</h1>
     <form id="recordForm">
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>University</th>
+                    <th>이름</th>
+                    <th>성별</th>
+                    <th>대학</th>
                     <th>제멀 (cm)</th>
-                    <th>Gender</th>
                     <th>메던 (m)</th>
-                    <th>Gender</th>
-                    <th>10m (seconds)</th>
-                    <th>Gender</th>
+                    <th>10m (초)</th>
                     <th>배근력 (kg)</th>
-                    <th>Gender</th>
-                    <th>Total Score</th>
+                    <th>총점</th>
                 </tr>
             </thead>
             <tbody id="studentsContainer">
                 <tr class="student">
                     <td>
                         <input type="text" name="studentName" required>
-                        <button type="button" class="loadButton">Load</button>
+                        <button type="button" class="loadButton">불러오기</button>
+                    </td>
+                    <td>
+                        <select name="gender" required>
+                            <option value="male">남자</option>
+                            <option value="female">여자</option>
+                        </select>
                     </td>
                     <td>
                         <select name="university" required>
@@ -51,41 +54,17 @@
                         </select>
                     </td>
                     <td><input type="number" name="recordJemul" step="0.01" required></td>
-                    <td>
-                        <select name="genderJemul" required>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </td>
                     <td><input type="number" name="recordMedun" step="0.01" required></td>
-                    <td>
-                        <select name="genderMedun" required>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </td>
                     <td><input type="number" name="record10m" step="0.01" required></td>
-                    <td>
-                        <select name="gender10m" required>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </td>
                     <td><input type="number" name="recordBackStrength" step="0.01" required></td>
-                    <td>
-                        <select name="genderBackStrength" required>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </td>
                     <td class="totalScore"></td>
                 </tr>
             </tbody>
         </table>
-        <button type="button" id="addStudentButton">Add Student</button>
-        <button type="submit">Calculate Total Scores</button>
+        <button type="button" id="addStudentButton">학생 추가</button>
+        <button type="submit">총점 계산</button>
     </form>
-    <button id="saveButton">Save All Scores</button>
+    <button id="saveButton">모든 기록 저장</button>
 
     <script>
         document.getElementById('addStudentButton').addEventListener('click', function() {
@@ -110,24 +89,23 @@
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert(`Error: ${data.error}`);
+                    alert(`에러: ${data.error}`);
                 } else if (data.message) {
                     alert(data.message);
                 } else {
+                    const universitySelect = row.querySelector('select[name="university"]');
+                    const genderSelect = row.querySelector('select[name="gender"]');
                     data.student.forEach(record => {
-                        row.querySelector('select[name="university"]').value = record.university_name;
+                        universitySelect.value = record.university_name;
+                        genderSelect.value = record.gender;
                         if (record.event_name === '제멀') {
                             row.querySelector('input[name="recordJemul"]').value = record.record;
-                            row.querySelector('select[name="genderJemul"]').value = record.gender;
                         } else if (record.event_name === '메던') {
                             row.querySelector('input[name="recordMedun"]').value = record.record;
-                            row.querySelector('select[name="genderMedun"]').value = record.gender;
                         } else if (record.event_name === '10m') {
                             row.querySelector('input[name="record10m"]').value = record.record;
-                            row.querySelector('select[name="gender10m"]').value = record.gender;
                         } else if (record.event_name === '배근력') {
                             row.querySelector('input[name="recordBackStrength"]').value = record.record;
-                            row.querySelector('select[name="genderBackStrength"]').value = record.gender;
                         }
                     });
                 }
@@ -145,20 +123,17 @@
             rows.forEach(row => {
                 const studentName = row.querySelector('input[name="studentName"]').value;
                 const university = row.querySelector('select[name="university"]').value;
+                const gender = row.querySelector('select[name="gender"]').value;
                 const recordJemul = row.querySelector('input[name="recordJemul"]').value;
-                const genderJemul = row.querySelector('select[name="genderJemul"]').value;
                 const recordMedun = row.querySelector('input[name="recordMedun"]').value;
-                const genderMedun = row.querySelector('select[name="genderMedun"]').value;
                 const record10m = row.querySelector('input[name="record10m"]').value;
-                const gender10m = row.querySelector('select[name="gender10m"]').value;
                 const recordBackStrength = row.querySelector('input[name="recordBackStrength"]').value;
-                const genderBackStrength = row.querySelector('select[name="genderBackStrength"]').value;
 
                 students.push(
-                    { name: studentName, university: university, event: '제멀', record: recordJemul, gender: genderJemul },
-                    { name: studentName, university: university, event: '메던', record: recordMedun, gender: genderMedun },
-                    { name: studentName, university: university, event: '10m', record: record10m, gender: gender10m },
-                    { name: studentName, university: university, event: '배근력', record: recordBackStrength, gender: genderBackStrength }
+                    { name: studentName, university: university, event: '제멀', record: recordJemul, gender: gender },
+                    { name: studentName, university: university, event: '메던', record: recordMedun, gender: gender },
+                    { name: studentName, university: university, event: '10m', record: record10m, gender: gender },
+                    { name: studentName, university: university, event: '배근력', record: recordBackStrength, gender: gender }
                 );
             });
 
@@ -173,7 +148,7 @@
             .then(data => {
                 if (data.error) {
                     document.querySelectorAll('.totalScore').forEach((td, index) => {
-                        td.innerText = 'Error';
+                        td.innerText = '에러';
                     });
                 } else {
                     document.querySelectorAll('.student').forEach((row, index) => {
@@ -193,20 +168,17 @@
             rows.forEach(row => {
                 const studentName = row.querySelector('input[name="studentName"]').value;
                 const university = row.querySelector('select[name="university"]').value;
+                const gender = row.querySelector('select[name="gender"]').value;
                 const recordJemul = row.querySelector('input[name="recordJemul"]').value;
-                const genderJemul = row.querySelector('select[name="genderJemul"]').value;
                 const recordMedun = row.querySelector('input[name="recordMedun"]').value;
-                const genderMedun = row.querySelector('select[name="genderMedun"]').value;
                 const record10m = row.querySelector('input[name="record10m"]').value;
-                const gender10m = row.querySelector('select[name="gender10m"]').value;
                 const recordBackStrength = row.querySelector('input[name="recordBackStrength"]').value;
-                const genderBackStrength = row.querySelector('select[name="genderBackStrength"]').value;
 
                 students.push(
-                    { name: studentName, university: university, event: '제멀', record: recordJemul, gender: genderJemul },
-                    { name: studentName, university: university, event: '메던', record: recordMedun, gender: genderMedun },
-                    { name: studentName, university: university, event: '10m', record: record10m, gender: gender10m },
-                    { name: studentName, university: university, event: '배근력', record: recordBackStrength, gender: genderBackStrength }
+                    { name: studentName, university: university, event: '제멀', record: recordJemul, gender: gender },
+                    { name: studentName, university: university, event: '메던', record: recordMedun, gender: gender },
+                    { name: studentName, university: university, event: '10m', record: record10m, gender: gender },
+                    { name: studentName, university: university, event: '배근력', record: recordBackStrength, gender: gender }
                 );
             });
 
@@ -220,9 +192,9 @@
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert(`Error: ${data.error}`);
+                    alert(`에러: ${data.error}`);
                 } else {
-                    alert('All scores saved successfully');
+                    alert('모든 기록이 성공적으로 저장되었습니다');
                 }
             })
             .catch(error => {
