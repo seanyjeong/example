@@ -2,137 +2,114 @@
 <html>
 <head>
     <title>University Record Input</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
     <h1>University Record Input</h1>
     <form id="recordForm">
-        <div id="studentsContainer">
-            <div class="student">
-                <h2>Student 1</h2>
-                <label for="studentName1">Name:</label>
-                <input type="text" id="studentName1" name="studentName" required>
-                <label for="university1">Select University:</label>
-                <select id="university1" name="university" required>
-                    <option value="가천체육">가천체육</option>
-                    <!-- 추가할 대학들 -->
-                </select>
-                <h3>제멀</h3>
-                <label for="recordJemul1">Enter 제멀 Record (cm):</label>
-                <input type="number" id="recordJemul1" name="recordJemul" step="0.01" required>
-                <br>
-                <label for="genderJemul1">Select Gender:</label>
-                <select id="genderJemul1" name="genderJemul" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <h3>메던</h3>
-                <label for="recordMedun1">Enter 메던 Record (m):</label>
-                <input type="number" id="recordMedun1" name="recordMedun" step="0.01" required>
-                <br>
-                <label for="genderMedun1">Select Gender:</label>
-                <select id="genderMedun1" name="genderMedun" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <h3>10m</h3>
-                <label for="record10m1">Enter 10m Record (seconds):</label>
-                <input type="number" id="record10m1" name="record10m" step="0.01" required>
-                <br>
-                <label for="gender10m1">Select Gender:</label>
-                <select id="gender10m1" name="gender10m" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <h3>배근력</h3>
-                <label for="recordBackStrength1">Enter 배근력 Record (kg):</label>
-                <input type="number" id="recordBackStrength1" name="recordBackStrength" step="0.01" required>
-                <br>
-                <label for="genderBackStrength1">Select Gender:</label>
-                <select id="genderBackStrength1" name="genderBackStrength" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <br>
-            </div>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>University</th>
+                    <th>제멀 (cm)</th>
+                    <th>Gender</th>
+                    <th>메던 (m)</th>
+                    <th>Gender</th>
+                    <th>10m (seconds)</th>
+                    <th>Gender</th>
+                    <th>배근력 (kg)</th>
+                    <th>Gender</th>
+                    <th>Total Score</th>
+                </tr>
+            </thead>
+            <tbody id="studentsContainer">
+                <tr class="student">
+                    <td><input type="text" name="studentName" required></td>
+                    <td>
+                        <select name="university" required>
+                            <option value="가천체육">가천체육</option>
+                            <!-- 추가할 대학들 -->
+                        </select>
+                    </td>
+                    <td><input type="number" name="recordJemul" step="0.01" required></td>
+                    <td>
+                        <select name="genderJemul" required>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="recordMedun" step="0.01" required></td>
+                    <td>
+                        <select name="genderMedun" required>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="record10m" step="0.01" required></td>
+                    <td>
+                        <select name="gender10m" required>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="recordBackStrength" step="0.01" required></td>
+                    <td>
+                        <select name="genderBackStrength" required>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </td>
+                    <td class="totalScore"></td>
+                </tr>
+            </tbody>
+        </table>
         <button type="button" id="addStudentButton">Add Student</button>
-        <button type="submit">Calculate Total Score</button>
+        <button type="submit">Calculate Total Scores</button>
     </form>
     <button id="saveButton">Save All Scores</button>
-    <h2>Total Score: <span id="totalScore"></span></h2>
 
     <script>
-        let studentCount = 1;
-
         document.getElementById('addStudentButton').addEventListener('click', function() {
-            studentCount++;
-            const studentDiv = document.createElement('div');
-            studentDiv.classList.add('student');
-            studentDiv.innerHTML = `
-                <h2>Student ${studentCount}</h2>
-                <label for="studentName${studentCount}">Name:</label>
-                <input type="text" id="studentName${studentCount}" name="studentName" required>
-                <label for="university${studentCount}">Select University:</label>
-                <select id="university${studentCount}" name="university" required>
-                    <option value="가천체육">가천체육</option>
-                    <!-- 추가할 대학들 -->
-                </select>
-                <h3>제멀</h3>
-                <label for="recordJemul${studentCount}">Enter 제멀 Record (cm):</label>
-                <input type="number" id="recordJemul${studentCount}" name="recordJemul" step="0.01" required>
-                <br>
-                <label for="genderJemul${studentCount}">Select Gender:</label>
-                <select id="genderJemul${studentCount}" name="genderJemul" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <h3>메던</h3>
-                <label for="recordMedun${studentCount}">Enter 메던 Record (m):</label>
-                <input type="number" id="recordMedun${studentCount}" name="recordMedun" step="0.01" required>
-                <br>
-                <label for="genderMedun${studentCount}">Select Gender:</label>
-                <select id="genderMedun${studentCount}" name="genderMedun" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <h3>10m</h3>
-                <label for="record10m${studentCount}">Enter 10m Record (seconds):</label>
-                <input type="number" id="record10m${studentCount}" name="record10m" step="0.01" required>
-                <br>
-                <label for="gender10m${studentCount}">Select Gender:</label>
-                <select id="gender10m${studentCount}" name="gender10m" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <h3>배근력</h3>
-                <label for="recordBackStrength${studentCount}">Enter 배근력 Record (kg):</label>
-                <input type="number" id="recordBackStrength${studentCount}" name="recordBackStrength" step="0.01" required>
-                <br>
-                <label for="genderBackStrength${studentCount}">Select Gender:</label>
-                <select id="genderBackStrength${studentCount}" name="genderBackStrength" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <br>
-            `;
-            document.getElementById('studentsContainer').appendChild(studentDiv);
+            const studentsContainer = document.getElementById('studentsContainer');
+            const newRow = studentsContainer.rows[0].cloneNode(true);
+            newRow.querySelectorAll('input').forEach(input => input.value = '');
+            newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+            newRow.querySelector('.totalScore').innerText = '';
+            studentsContainer.appendChild(newRow);
         });
 
         document.getElementById('recordForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
             const students = [];
-            document.querySelectorAll('.student').forEach(studentDiv => {
-                const studentName = studentDiv.querySelector('input[name="studentName"]').value;
-                const university = studentDiv.querySelector('select[name="university"]').value;
-                const recordJemul = studentDiv.querySelector('input[name="recordJemul"]').value;
-                const genderJemul = studentDiv.querySelector('select[name="genderJemul"]').value;
-                const recordMedun = studentDiv.querySelector('input[name="recordMedun"]').value;
-                const genderMedun = studentDiv.querySelector('select[name="genderMedun"]').value;
-                const record10m = studentDiv.querySelector('input[name="record10m"]').value;
-                const gender10m = studentDiv.querySelector('select[name="gender10m"]').value;
-                const recordBackStrength = studentDiv.querySelector('input[name="recordBackStrength"]').value;
-                const genderBackStrength = studentDiv.querySelector('select[name="genderBackStrength"]').value;
+            const rows = document.querySelectorAll('.student');
+            rows.forEach(row => {
+                const studentName = row.querySelector('input[name="studentName"]').value;
+                const university = row.querySelector('select[name="university"]').value;
+                const recordJemul = row.querySelector('input[name="recordJemul"]').value;
+                const genderJemul = row.querySelector('select[name="genderJemul"]').value;
+                const recordMedun = row.querySelector('input[name="recordMedun"]').value;
+                const genderMedun = row.querySelector('select[name="genderMedun"]').value;
+                const record10m = row.querySelector('input[name="record10m"]').value;
+                const gender10m = row.querySelector('select[name="gender10m"]').value;
+                const recordBackStrength = row.querySelector('input[name="recordBackStrength"]').value;
+                const genderBackStrength = row.querySelector('select[name="genderBackStrength"]').value;
 
                 students.push(
                     { name: studentName, university: university, event: '제멀', record: recordJemul, gender: genderJemul },
@@ -152,9 +129,14 @@
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    document.getElementById('totalScore').innerText = data.error;
+                    document.querySelectorAll('.totalScore').forEach((td, index) => {
+                        td.innerText = 'Error';
+                    });
                 } else {
-                    document.getElementById('totalScore').innerText = data.totalScore;
+                    document.querySelectorAll('.student').forEach((row, index) => {
+                        const totalScore = data[index].totalScore;
+                        row.querySelector('.totalScore').innerText = totalScore;
+                    });
                 }
             })
             .catch(error => {
@@ -164,17 +146,18 @@
 
         document.getElementById('saveButton').addEventListener('click', function() {
             const students = [];
-            document.querySelectorAll('.student').forEach(studentDiv => {
-                const studentName = studentDiv.querySelector('input[name="studentName"]').value;
-                const university = studentDiv.querySelector('select[name="university"]').value;
-                const recordJemul = studentDiv.querySelector('input[name="recordJemul"]').value;
-                const genderJemul = studentDiv.querySelector('select[name="genderJemul"]').value;
-                const recordMedun = studentDiv.querySelector('input[name="recordMedun"]').value;
-                const genderMedun = studentDiv.querySelector('select[name="genderMedun"]').value;
-                const record10m = studentDiv.querySelector('input[name="record10m"]').value;
-                const gender10m = studentDiv.querySelector('select[name="gender10m"]').value;
-                const recordBackStrength = studentDiv.querySelector('input[name="recordBackStrength"]').value;
-                const genderBackStrength = studentDiv.querySelector('select[name="genderBackStrength"]').value;
+            const rows = document.querySelectorAll('.student');
+            rows.forEach(row => {
+                const studentName = row.querySelector('input[name="studentName"]').value;
+                const university = row.querySelector('select[name="university"]').value;
+                const recordJemul = row.querySelector('input[name="recordJemul"]').value;
+                const genderJemul = row.querySelector('select[name="genderJemul"]').value;
+                const recordMedun = row.querySelector('input[name="recordMedun"]').value;
+                const genderMedun = row.querySelector('select[name="genderMedun"]').value;
+                const record10m = row.querySelector('input[name="record10m"]').value;
+                const gender10m = row.querySelector('select[name="gender10m"]').value;
+                const recordBackStrength = row.querySelector('input[name="recordBackStrength"]').value;
+                const genderBackStrength = row.querySelector('select[name="genderBackStrength"]').value;
 
                 students.push(
                     { name: studentName, university: university, event: '제멀', record: recordJemul, gender: genderJemul },
