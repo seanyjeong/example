@@ -29,9 +29,13 @@
                     <th>성별</th>
                     <th>대학</th>
                     <th>제멀 (cm)</th>
+                    <th>제멀 점수</th>
                     <th>메던 (m)</th>
+                    <th>메던 점수</th>
                     <th>10m (초)</th>
+                    <th>10m 점수</th>
                     <th>배근력 (kg)</th>
+                    <th>배근력 점수</th>
                     <th>총점</th>
                 </tr>
             </thead>
@@ -54,9 +58,13 @@
                         </select>
                     </td>
                     <td><input type="number" name="recordJemul" step="0.01" required></td>
+                    <td class="scoreJemul"></td>
                     <td><input type="number" name="recordMedun" step="0.01" required></td>
+                    <td class="scoreMedun"></td>
                     <td><input type="number" name="record10m" step="0.01" required></td>
+                    <td class="score10m"></td>
                     <td><input type="number" name="recordBackStrength" step="0.01" required></td>
+                    <td class="scoreBackStrength"></td>
                     <td class="totalScore"></td>
                 </tr>
             </tbody>
@@ -72,7 +80,11 @@
             const newRow = studentsContainer.rows[0].cloneNode(true);
             newRow.querySelectorAll('input').forEach(input => input.value = '');
             newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-            newRow.querySelector('.totalScore').innerText = '';
+            newRow.querySelectorAll('td').forEach(td => {
+                if (td.className !== 'totalScore') {
+                    td.innerText = '';
+                }
+            });
             newRow.querySelector('.loadButton').addEventListener('click', loadStudent);
             studentsContainer.appendChild(newRow);
         });
@@ -129,12 +141,17 @@
                 const record10m = row.querySelector('input[name="record10m"]').value;
                 const recordBackStrength = row.querySelector('input[name="recordBackStrength"]').value;
 
-                students.push(
-                    { name: studentName, university: university, event: '제멀', record: recordJemul, gender: gender },
-                    { name: studentName, university: university, event: '메던', record: recordMedun, gender: gender },
-                    { name: studentName, university: university, event: '10m', record: record10m, gender: gender },
-                    { name: studentName, university: university, event: '배근력', record: recordBackStrength, gender: gender }
-                );
+                students.push({
+                    name: studentName,
+                    university: university,
+                    gender: gender,
+                    record: {
+                        '제멀': recordJemul,
+                        '메던': recordMedun,
+                        '10m': record10m,
+                        '배근력': recordBackStrength
+                    }
+                });
             });
 
             fetch('https://supermax.kr:4000/get-total-score', {
@@ -147,16 +164,25 @@
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    document.querySelectorAll('.totalScore').forEach((td, index) => {
+                    document.querySelectorAll('.totalScore').forEach(td => {
                         td.innerText = '에러';
                     });
                 } else {
                     document.querySelectorAll('.student').forEach(row => {
                         const studentName = row.querySelector('input[name="studentName"]').value;
-                        const totalScoreObj = data.find(item => item.name === studentName);
-                        if (totalScoreObj) {
-                            row.querySelector('.totalScore').innerText = totalScoreObj.totalScore;
+                        const studentResult = data.find(item => item.name === studentName);
+                        if (studentResult) {
+                            row.querySelector('.scoreJemul').innerText = studentResult.scores['제멀'];
+                            row.querySelector('.scoreMedun').innerText = studentResult.scores['메던'];
+                            row.querySelector('.score10m').innerText = studentResult.scores['10m'];
+                            row.querySelector('.scoreBackStrength').innerText = studentResult.scores['배근력'];
+                            row.querySelector('.totalScore').innerText = studentResult.totalScore;
                         } else {
+                            row.querySelectorAll('td').forEach(td => {
+                                if (td.className !== 'totalScore') {
+                                    td.innerText = '점수 없음';
+                                }
+                            });
                             row.querySelector('.totalScore').innerText = '총점 없음';
                         }
                     });
@@ -179,12 +205,17 @@
                 const record10m = row.querySelector('input[name="record10m"]').value;
                 const recordBackStrength = row.querySelector('input[name="recordBackStrength"]').value;
 
-                students.push(
-                    { name: studentName, university: university, event: '제멀', record: recordJemul, gender: gender },
-                    { name: studentName, university: university, event: '메던', record: recordMedun, gender: gender },
-                    { name: studentName, university: university, event: '10m', record: record10m, gender: gender },
-                    { name: studentName, university: university, event: '배근력', record: recordBackStrength, gender: gender }
-                );
+                students.push({
+                    name: studentName,
+                    university: university,
+                    gender: gender,
+                    record: {
+                        '제멀': recordJemul,
+                        '메던': recordMedun,
+                        '10m': record10m,
+                        '배근력': recordBackStrength
+                    }
+                });
             });
 
             fetch('https://supermax.kr:4000/save-scores', {
