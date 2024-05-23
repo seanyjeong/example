@@ -151,9 +151,14 @@
                         td.innerText = '에러';
                     });
                 } else {
-                    document.querySelectorAll('.student').forEach((row, index) => {
-                        const totalScore = data.find(item => item.name === row.querySelector('input[name="studentName"]').value).totalScore;
-                        row.querySelector('.totalScore').innerText = totalScore;
+                    document.querySelectorAll('.student').forEach(row => {
+                        const studentName = row.querySelector('input[name="studentName"]').value;
+                        const totalScoreObj = data.find(item => item.name === studentName);
+                        if (totalScoreObj) {
+                            row.querySelector('.totalScore').innerText = totalScoreObj.totalScore;
+                        } else {
+                            row.querySelector('.totalScore').innerText = '총점 없음';
+                        }
                     });
                 }
             })
