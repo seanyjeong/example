@@ -1,38 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>University Record Input</title>
+    <title>대학 기록 입력</title>
 </head>
 <body>
-    <h1>University Record Input</h1>
+    <h1>대학 기록 입력</h1>
     <form id="recordForm">
-        <label for="university">Select University:</label>
+        <label for="university">대학교 선택:</label>
         <select id="university" name="university" required>
             <option value="가천체육">가천체육</option>
             <!-- 추가할 대학들 -->
         </select>
         <h2>제멀</h2>
-        <label for="recordJemul">Enter 제멀 Record (cm):</label>
+        <label for="recordJemul">제멀 기록 입력 (cm):</label>
         <input type="number" id="recordJemul" name="recordJemul" step="0.01" required>
         <br>
-        <label for="genderJemul">Select Gender:</label>
+        <label for="genderJemul">성별 선택:</label>
         <select id="genderJemul" name="genderJemul" required>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="male">남자</option>
+            <option value="female">여자</option>
         </select>
         <h2>메던</h2>
-        <label for="recordMedun">Enter 메던 Record (m):</label>
+        <label for="recordMedun">메던 기록 입력 (m):</label>
         <input type="number" id="recordMedun" name="recordMedun" step="0.01" required>
         <br>
-        <label for="genderMedun">Select Gender:</label>
+        <label for="genderMedun">성별 선택:</label>
         <select id="genderMedun" name="genderMedun" required>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="male">남자</option>
+            <option value="female">여자</option>
+        </select>
+        <h2>10m</h2>
+        <label for="record10m">10m 기록 입력 (s):</label>
+        <input type="number" id="record10m" name="record10m" step="0.01" required>
+        <br>
+        <label for="gender10m">성별 선택:</label>
+        <select id="gender10m" name="gender10m" required>
+            <option value="male">남자</option>
+            <option value="female">여자</option>
+        </select>
+        <h2>배근력</h2>
+        <label for="recordBackStrength">배근력 기록 입력 (kg):</label>
+        <input type="number" id="recordBackStrength" name="recordBackStrength" step="0.01" required>
+        <br>
+        <label for="genderBackStrength">성별 선택:</label>
+        <select id="genderBackStrength" name="genderBackStrength" required>
+            <option value="male">남자</option>
+            <option value="female">여자</option>
         </select>
         <br>
-        <button type="submit">Submit</button>
+        <button type="submit">제출</button>
     </form>
-    <h2>Total Score: <span id="totalScore"></span></h2>
+    <h2>총 점수: <span id="totalScore"></span></h2>
 
     <script>
         document.getElementById('recordForm').addEventListener('submit', function(event) {
@@ -43,6 +61,10 @@
             const genderJemul = document.getElementById('genderJemul').value;
             const recordMedun = document.getElementById('recordMedun').value;
             const genderMedun = document.getElementById('genderMedun').value;
+            const record10m = document.getElementById('record10m').value;
+            const gender10m = document.getElementById('gender10m').value;
+            const recordBackStrength = document.getElementById('recordBackStrength').value;
+            const genderBackStrength = document.getElementById('genderBackStrength').value;
 
             fetch('https://supermax.kr:4000/get-total-score', {
                 method: 'POST',
@@ -50,10 +72,18 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    university: university,
-                    records: [
-                        { event: '제멀', record: recordJemul, gender: genderJemul },
-                        { event: '메던', record: recordMedun, gender: genderMedun }
+                    students: [
+                        {
+                            name: '학생',
+                            university: university,
+                            gender: genderJemul, // assuming gender is the same for all events
+                            record: {
+                                '제멀': recordJemul,
+                                '메던': recordMedun,
+                                '10m': record10m,
+                                '배근력': recordBackStrength
+                            }
+                        }
                     ]
                 })
             })
@@ -62,7 +92,7 @@
                 if (data.error) {
                     document.getElementById('totalScore').innerText = data.error;
                 } else {
-                    document.getElementById('totalScore').innerText = data.totalScore;
+                    document.getElementById('totalScore').innerText = data[0].totalScore;
                 }
             })
             .catch(error => {
