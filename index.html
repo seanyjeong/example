@@ -40,7 +40,10 @@
             </thead>
             <tbody id="studentsContainer">
                 <tr class="student">
-                    <td><input type="text" name="studentName" required></td>
+                    <td>
+                        <input type="text" name="studentName" required>
+                        <button type="button" class="loadButton">Load</button>
+                    </td>
                     <td>
                         <select name="university" required>
                             <option value="가천체육">가천체육</option>
@@ -91,8 +94,48 @@
             newRow.querySelectorAll('input').forEach(input => input.value = '');
             newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
             newRow.querySelector('.totalScore').innerText = '';
+            newRow.querySelector('.loadButton').addEventListener('click', loadStudent);
             studentsContainer.appendChild(newRow);
         });
+
+        document.querySelectorAll('.loadButton').forEach(button => {
+            button.addEventListener('click', loadStudent);
+        });
+
+        function loadStudent(event) {
+            const row = event.target.closest('.student');
+            const studentName = row.querySelector('input[name="studentName"]').value;
+
+            fetch(`https://supermax.kr:4000/get-student?name=${studentName}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(`Error: ${data.error}`);
+                } else if (data.message) {
+                    alert(data.message);
+                } else {
+                    data.student.forEach(record => {
+                        row.querySelector('select[name="university"]').value = record.university_name;
+                        if (record.event_name === '제멀') {
+                            row.querySelector('input[name="recordJemul"]').value = record.record;
+                            row.querySelector('select[name="genderJemul"]').value = record.gender;
+                        } else if (record.event_name === '메던') {
+                            row.querySelector('input[name="recordMedun"]').value = record.record;
+                            row.querySelector('select[name="genderMedun"]').value = record.gender;
+                        } else if (record.event_name === '10m') {
+                            row.querySelector('input[name="record10m"]').value = record.record;
+                            row.querySelector('select[name="gender10m"]').value = record.gender;
+                        } else if (record.event_name === '배근력') {
+                            row.querySelector('input[name="recordBackStrength"]').value = record.record;
+                            row.querySelector('select[name="genderBackStrength"]').value = record.gender;
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
 
         document.getElementById('recordForm').addEventListener('submit', function(event) {
             event.preventDefault();
