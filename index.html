@@ -152,7 +152,7 @@
                     });
                 } else {
                     document.querySelectorAll('.student').forEach((row, index) => {
-                        const totalScore = data[index].totalScore;
+                        const totalScore = data.find(item => item.name === row.querySelector('input[name="studentName"]').value).totalScore;
                         row.querySelector('.totalScore').innerText = totalScore;
                     });
                 }
