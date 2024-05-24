@@ -101,7 +101,7 @@
             function loadStudent(event) {
                 const row = event.target.closest('.student');
                 const studentName = row.querySelector('input[name="studentName"]').value;
-                fetch(`https://supermax.kr:4000/get-student?name=${studentName}`)
+                fetch(`211.37.174.218:4000/get-student?name=${studentName}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
