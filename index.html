@@ -8,7 +8,10 @@
 <body>
     <form id="recordForm">
         <label for="university_name">University Name:</label>
-        <input type="text" id="university_name" name="university_name" required><br>
+        <select id="university_name" name="university_name" required>
+            <option value="가천체육">가천체육</option>
+            <!-- 필요시 다른 학교 이름을 추가 -->
+        </select><br>
 
         <label for="event_name">Event Name:</label>
         <select id="event_name" name="event_name" required>
@@ -39,7 +42,7 @@
             const formData = new FormData(this);
             fetch('/submit', {
                 method: 'POST',
-                body: JSON.stringify(Object.fromEntries(formData)),
+                body: JSON.stringify(Object.fromEntries(formData.entries())),
                 headers: {
                     'Content-Type': 'application/json'
                 }
