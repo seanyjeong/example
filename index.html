@@ -76,6 +76,214 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const addStudentButton = document.getElementById('addStudentButton');
+            addStudentButton.addEventListener('click', function() {
+                const studentsContainer = document.getElementById('studentsContainer');
+                const newRow = studentsContainer.rows[0].cloneNode(true);
+                newRow.querySelectorAll('input').forEach(input => input.value = '');
+                newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+                newRow.querySelectorAll('td').forEach(td => {
+                    if (td.className !== 'totalScore') {
+                        td.innerText = '';
+                    }
+                });
+                const loadButton = newRow.querySelector('.loadButton');
+                loadButton.addEventListener('click', loadStudent);
+                studentsContainer.appendChild(newRow);
+            });
+
+            const loadButtons = document.querySelectorAll('.loadButton');
+            loadButtons.forEach(button => {
+                button.addEventListener('click', loadStudent);
+            });
+
+            function loadStudent(event) {
+                const row = event.target.closest('.student');
+                const studentName = row.querySelector('input[name="studentName"]').value;
+                fetch(`https://211.37.174.218:4000/get-student?name=${studentName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(`에러: ${data.error}`);
+                        } else if (data.message) {
+                            alert(data.message);
+                        } else {
+                            const universitySelect = row.querySelector('select[name="university"]');
+                            const genderSelect = row.querySelector('select[name="gender"]');
+                            data.student.forEach(record => {
+                                universitySelect.value = record.university_name;
+                                genderSelect.value = record.gender;
+                                if (record.event_name === '제멀') {
+                                    row.querySelector('input[name="recordJemul"]').value = record.record;
+                                    row.querySelector('.scoreJemul').innerText = record.score;
+                                } else if (record.event_name === '메던') {
+                                    row.querySelector('input[name="recordMedun"]').value = record.record;
+                                    row.querySelector('.scoreMedun').innerText = record.score;
+                                } else if (record.event_name === '10m') {
+                                    row.querySelector('input[name="record10m"]').value = record.record;
+                                    row.querySelector('.score10m').innerText = record.score;
+                                } else if (record.event_name === '배근력') {
+                                    row.querySelector('input[name="recordBackStrength"]').value = record.record;
+                                    row.querySelector('.scoreBackStrength').innerText = record.score;
+                                }
+                                row.querySelector('.totalScore').innerText = record.total_score;
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+
+            document.getElementById('recordForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const students = [];
+                const rows = document.querySelectorAll('.student');
+                rows.forEach(row => {
+                    const studentName = row.querySelector('input[name="studentName"]').value;
+                    const university = row.querySelector('select[name="university"]').value;
+                    const gender = row.querySelector('select[name="gender"]').value;
+                    const recordJemul = row.querySelector('input[name="recordJemul"]').value;
+                    const recordMedun = row.querySelector('input[name="recordMedun"]').value;
+                    const record10m = row.querySelector('input[name="record10m"]').value;
+                    const recordBackStrength = row.querySelector('input[name="recordBackStrength"]').value;
+                    students.push({
+                        name: studentName,
+                        university: university,
+                        gender: gender,
+                        record: {
+                            '제멀': recordJemul,
+                            '메던': recordMedun,
+                            '10m': record10m,
+                            '배근력': recordBackStrength
+                        }
+                    });
+                });
+
+                fetch('https://211.37.174.218:4000/get-total-score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ students: students })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            document.querySelectorAll('.totalScore').forEach(td => {
+                                td.innerText = '에러';
+                            });
+                        } else {
+                            document.querySelectorAll('.student').forEach(row => {
+                                const studentName = row.querySelector('input[name="studentName"]').value;
+                                const studentResult = data.find(item => item.name === studentName);
+                                if (studentResult) {
+                                    row.querySelector('.scoreJemul').innerText = studentResult.scores['제멀'];
+                                    row.querySelector('.scoreMedun').innerText = studentResult.scores['메던'];
+                                    row.querySelector('.score10m').innerText = studentResult.scores['10m'];
+                                    row.querySelector('.scoreBackStrength').innerText = studentResult.scores['배근력'];
+                                    row.querySelector('.totalScore').innerText = studentResult.totalScore;
+                                } else {
+                                    row.querySelectorAll('td').forEach(td => {
+                                        if (td.className !== 'totalScore') {
+                                            td.innerText = '점수 없음';
+                                        }
+                                    });
+                                    row.querySelector('.totalScore').innerText = '총점 없음';
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+
+            const saveButton = document.getElementById('saveButton');
+            saveButton.addEventListener('click', function() {
+                const students = [];
+                const rows = document.querySelectorAll('.student');
+                rows.forEach(row => {
+                    const studentName = row.querySelector('input[name="studentName"]').value;
+                    const university = row.querySelector('select[name="university"]').value;
+                    const gender = row.querySelector('select[name="gender"]').value;
+                    const recordJemul = row.querySelector('input[name="recordJemul"]').value;
+                    const recordMedun = row.querySelector('input[name="recordMedun"]').value;
+                    const record10m = row.querySelector('input[name="record10m"]').value;
+                    const recordBackStrength    <title>기록 입력 페이지</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>기록 입력 페이지</h1>
+    <form id="recordForm">
+        <table>
+            <thead>
+                <tr>
+                    <th>이름</th>
+                    <th>성별</th>
+                    <th>대학</th>
+                    <th>제멀 (cm)</th>
+                    <th>제멀 점수</th>
+                    <th>메던 (m)</th>
+                    <th>메던 점수</th>
+                    <th>10m (초)</th>
+                    <th>10m 점수</th>
+                    <th>배근력 (kg)</th>
+                    <th>배근력 점수</th>
+                    <th>총점</th>
+                </tr>
+            </thead>
+            <tbody id="studentsContainer">
+                <tr class="student">
+                    <td>
+                        <input type="text" name="studentName" required>
+                        <button type="button" class="loadButton">불러오기</button>
+                    </td>
+                    <td>
+                        <select name="gender" required>
+                            <option value="male">남자</option>
+                            <option value="female">여자</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="university" required>
+                            <option value="가천체육">가천체육</option>
+                            <!-- 추가할 대학들 -->
+                        </select>
+                    </td>
+                    <td><input type="number" name="recordJemul" step="0.01" required></td>
+                    <td class="scoreJemul"></td>
+                    <td><input type="number" name="recordMedun" step="0.01" required></td>
+                    <td class="scoreMedun"></td>
+                    <td><input type="number" name="record10m" step="0.01" required></td>
+                    <td class="score10m"></td>
+                    <td><input type="number" name="recordBackStrength" step="0.01" required></td>
+                    <td class="scoreBackStrength"></td>
+                    <td class="totalScore"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" id="addStudentButton">학생 추가</button>
+        <button type="submit">총점 계산</button>
+    </form>
+    <button id="saveButton">모든 기록 저장</button>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addStudentButton = document.getElementById('addStudentButton');
             if (addStudentButton) {
                 addStudentButton.addEventListener('click', function() {
                     const studentsContainer = document.getElementById('studentsContainer');
@@ -83,7 +291,7 @@
                     newRow.querySelectorAll('input').forEach(input => input.value = '');
                     newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
                     newRow.querySelectorAll('td').forEach(td => {
-                        if (td.className !== 'totalScore') {
+                        if (!td.classList.contains('totalScore')) {
                             td.innerText = '';
                         }
                     });
@@ -101,7 +309,7 @@
             function loadStudent(event) {
                 const row = event.target.closest('.student');
                 const studentName = row.querySelector('input[name="studentName"]').value;
-                fetch(`211.37.174.218:4000/get-student?name=${studentName}`)
+                fetch(`https://211.37.174.218:4000/get-student?name=${studentName}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
@@ -184,7 +392,7 @@
                                 row.querySelector('.totalScore').innerText = studentResult.totalScore;
                             } else {
                                 row.querySelectorAll('td').forEach(td => {
-                                    if (td.className !== 'totalScore') {
+                                    if (!td.classList.contains('totalScore')) {
                                         td.innerText = '점수 없음';
                                     }
                                 });
