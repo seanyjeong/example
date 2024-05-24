@@ -40,7 +40,7 @@
             e.preventDefault();
 
             const formData = new FormData(this);
-            fetch('https://211.37.174.218:3000/submit', { // Node.js 서버의 HTTPS URL로 변경
+            fetch('https://supermax.kr:3000/submit', { // Node.js 서버의 HTTPS URL로 변경
                 method: 'POST',
                 body: JSON.stringify(Object.fromEntries(formData.entries())),
                 headers: {
